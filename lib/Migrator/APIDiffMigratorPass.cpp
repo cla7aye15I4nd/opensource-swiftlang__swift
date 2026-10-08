@@ -971,10 +971,10 @@ struct APIDiffMigratorPass : public ASTMigratorPass, public SourceEntityWalker {
 
   void handleStringRepresentableArg(ValueDecl *FD, ArgumentList *Args,
                                     Expr *Call) {
-    NodeAnnotation Kind;
+    std::optional<NodeAnnotation> Kind;
     StringRef RawType;
     StringRef NewAttributeType;
-    uint8_t ArgIdx;
+    std::optional<uint8_t> ArgIdx;
     for (auto Item: getRelatedDiffItems(FD)) {
       if (auto *CI = dyn_cast<CommonDiffItem>(Item)) {
         if (CI->isStringRepresentableChange()) {
@@ -992,15 +992,16 @@ struct APIDiffMigratorPass : public ASTMigratorPass, public SourceEntityWalker {
     Expr *WrapTarget = Call;
     bool FromString = false;
     if (ArgIdx) {
-      ArgIdx --;
+      --ArgIdx.value();
       FromString = true;
       auto AllArgs = getCallArgInfo(SM, Args, LabelRangeEndAt::LabelNameOnly);
       if (AllArgs.size() <= ArgIdx)
         return;
-      WrapTarget = AllArgs[ArgIdx].ArgExp;
+      WrapTarget = AllArgs[ArgIdx.value()].ArgExp;
     }
     assert(WrapTarget);
-    insertHelperFunction(Kind, RawType, NewAttributeType, FromString, WrapTarget);
+    insertHelperFunction(Kind.value(), RawType, NewAttributeType, FromString,
+                         WrapTarget);
   }
 
   bool hasRevertRawRepresentableChange(ValueDecl *VD) {

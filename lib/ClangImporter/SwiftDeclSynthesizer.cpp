@@ -1694,7 +1694,7 @@ synthesizeUnwrappingGetterOrAddressGetterBody(AbstractFunctionDecl *afd,
 
   // This default handles C++'s operator[] that returns a value type.
   Expr *propertyExpr = getterImplCallExpr;
-  PointerTypeKind ptrKind;
+  std::optional<PointerTypeKind> ptrKind;
 
   // The following check returns true if the subscript operator returns a
   // C++ reference type. This check actually checks to see if the type is
@@ -1702,11 +1702,13 @@ synthesizeUnwrappingGetterOrAddressGetterBody(AbstractFunctionDecl *afd,
   // are Optional types when imported. TODO: Use a more obvious check
   // here.
   if (!isAddress &&
-      getterImpl->getResultInterfaceType()->getAnyPointerElementType(ptrKind)) {
+      getterImpl->getResultInterfaceType()->getAnyPointerElementType(
+          ptrKind.value())) {
     // `getterImpl` can return either UnsafePointer or
     // UnsafeMutablePointer. Retrieve the corresponding `.pointee`
     // declaration.
-    VarDecl *pointeePropertyDecl = ctx.getPointerPointeePropertyDecl(ptrKind);
+    VarDecl *pointeePropertyDecl =
+        ctx.getPointerPointeePropertyDecl(ptrKind.value());
 
     // Handle operator[] that returns a reference type.
     SubstitutionMap subMap =

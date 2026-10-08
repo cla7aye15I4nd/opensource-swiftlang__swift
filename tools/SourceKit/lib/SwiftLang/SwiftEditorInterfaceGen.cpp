@@ -266,7 +266,7 @@ static void reportSemanticAnnotations(const SourceTextInfo &IFaceInfo,
     if (Ref.Mod) {
       Kind = SwiftLangSupport::getUIDForModuleRef();
       IsSystem = Ref.Mod.isNonUserModule();
-    } else if (Ref.Dcl) {
+    } else {
       Kind = SwiftLangSupport::getUIDForDecl(Ref.Dcl, /*IsRef=*/true);
       IsSystem = Ref.Dcl->getModuleContext()->isNonUserModule();
     }

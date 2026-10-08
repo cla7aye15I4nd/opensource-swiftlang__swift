@@ -1794,7 +1794,7 @@ bool WitnessChecker::findBestWitness(
     Done
   };
 
-  bool anyFromUnconstrainedExtension;
+  bool anyFromUnconstrainedExtension = false;
   numViable = 0;
   for (Attempt attempt = Regular; numViable == 0 && attempt != Done;
        attempt = static_cast<Attempt>(attempt + 1)) {
@@ -1830,7 +1830,6 @@ bool WitnessChecker::findBestWitness(
     }
 
     // Match each of the witnesses to the requirement.
-    anyFromUnconstrainedExtension = false;
     bestIdx = 0;
 
     for (auto witness : witnesses) {
